@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -40,8 +41,8 @@ public class DriveTrain extends SubsystemBase
     leftDriveTalon.setNeutralMode(NeutralMode.Coast);
     rightDriveTalon.setNeutralMode(NeutralMode.Coast);
 
-    leftDriveTalon.setInverted(true);
-    rightDriveTalon.setInverted(false);
+    leftDriveTalon.setInverted(false);
+    rightDriveTalon.setInverted(true);
 
     leftDriveTalon.setSensorPhase(true);
     rightDriveTalon.setSensorPhase(true);
@@ -61,14 +62,17 @@ public class DriveTrain extends SubsystemBase
   public void resetEncoders() {
     leftDriveTalon.setSelectedSensorPosition(0,0,10);
     rightDriveTalon.setSelectedSensorPosition(0,0,10);
+
   }
 
   public double getTicks() {
     return (leftDriveTalon.getSelectedSensorPosition(0) + rightDriveTalon.getSelectedSensorPosition(0)) / 2.0;
   }
- 
+ public double TicksToMeters(){
+  return(getTicks() * Units.inchesToMeters(6) * Math.PI/4096);
+ }
   public double getAngle(){
-    return navx.getAngle(); 
+    return -navx.getAngle(); 
   }
  
   public void resetNavx(){
@@ -80,9 +84,12 @@ public class DriveTrain extends SubsystemBase
     SmartDashboard.putNumber("Left Voltage", leftDriveTalon.getMotorOutputPercent());
     SmartDashboard.putNumber("Right Voltage", rightDriveTalon.getMotorOutputPercent());
     SmartDashboard.putNumber("Angle", navx.getAngle());
-
+    SmartDashboard.putNumber("Ticks",getTicks());  
+    //POSTING ENCORDER VALUE
+    SmartDashboard.putNumber("Left Encorder Ticks", leftDriveTalon.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Right Encorder Ticks", rightDriveTalon.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Distance Traveled: ",TicksToMeters());   
     LeftVoltage.setDouble(leftDriveTalon.getMotorOutputPercent());
     RightVoltage.setDouble(rightDriveTalon.getMotorOutputPercent());
-
   }
 }

@@ -8,6 +8,7 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -26,11 +27,16 @@ public class RobotContainer {
 
   private final DriveTrain dt = new DriveTrain();
 
-  private final TankDrive tankDrive = new TankDrive(dt, joy1);
+  private final TankDrive tankDrive = new TankDrive (dt, joy1);
+
+  private final EncoderDrive encoderDrive = new EncoderDrive(dt,1.0); 
+  
+  private final PIDTurn pidTurn = new PIDTurn(dt,90.0); 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    dt.setDefaultCommand(tankDrive);
+    EncoderDrive encoderDrive = new EncoderDrive(dt, 1.0); 
+    dt.setDefaultCommand (tankDrive);
     // Configure the trigger bindings
     configureBindings();
   }
@@ -54,7 +60,23 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    return new SequentialCommandGroup(
+      new EncoderDrive(dt, 1.0), 
+      new PIDTurn(dt, 90.0), 
+      new EncoderDrive(dt, 1.0), 
+      new PIDTurn(dt, 90.0), 
+      new EncoderDrive(dt, 1.0),
+      new PIDTurn(dt, 90.0)
+    );
     // An example command will be run in autonomous
-    return null;
+    // return new SequentialCommandGroup(
+    //   new EncoderDrive(dt, 1.0), 
+    //   new PIDTurn(dt, 90.0), 
+    //   new EncoderDrive(dt, 1.0), 
+    //   new PIDTurn(dt, 90.0), 
+    //   new EncoderDrive(dt, 1.0),
+    //   new PIDTurn(dt, 90.0), 
+    //   new EncoderDrive(dt, 1.0) 
+    // );
   }
 }
